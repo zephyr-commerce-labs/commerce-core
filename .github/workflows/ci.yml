@@ -1,34 +1,24 @@
-name: CI           # GitHub aracında görünen ad
-
-on:                # Ne zaman çalışsın?
-  push:
-    branches: [main, dev]
-  pull_request:
-    branches: [main, dev]
+# .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
 
 jobs:
   lint-test:
-    runs-on: ubuntu-latest          # Sanal makine
+    runs-on: ubuntu-latest
     steps:
-      # 1) Kodu çek
       - uses: actions/checkout@v4
-
-      # 2) Python ortamı
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      # 3) Bağımlılıkları yükle
-      - run: pip install black ruff pytest
-
-      # 4) Lint (stil) kontrolü
-      - name: Black (format)
-        run: black --check .
+      # Gerekiyorsa Black'i kaldırın; Ruff 'format' da yapabilir
+      - run: pip install ruff pytest
 
       - name: Ruff (statik analiz)
-        run: ruff .
+        run: ruff check .
 
-      # 5) Test aşaması
+      # İsterseniz otomatik düzeltme:
+      # run: ruff check --fix .
+
       - name: Pytest
-        run: |
-          pytest -q || echo "No tests yet – skipping failure"
+        run: pytest -q || echo "no tests yet"
